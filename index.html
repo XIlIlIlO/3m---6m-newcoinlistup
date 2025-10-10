@@ -39,62 +39,62 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
       gap: 10px 20px;
-      padding-right: 60px;  /* 오른쪽에 공백 추가 */
+      padding-right: 60px;   /* 오른쪽 여백 */
       box-sizing: border-box;
     }
 
+    /* 카드 + 민트 네온 */
     li.coin-item {
-  position: relative;
-  background: #1b1b1b;
-  padding: 10px 16px;
-  border-radius: 8px;
-  transition: all 0.25s ease;
-  border: 1px solid rgba(0, 255, 230, 0.12); /* ✅ 민트색 테두리 */
-  box-shadow: 0 0 6px rgba(0, 255, 230, 0.05);
-}
-
+      display: flex;
+      justify-content: flex-start;              /* ← 좌측 정렬 고정 */
+      align-items: center;
+      position: relative;
+      background: #1b1b1b;
+      padding: 10px 16px;
+      border-radius: 8px;
+      transition: all 0.25s ease;
+      border: 1px solid rgba(0, 255, 230, 0.12); /* 민트 테두리 */
+      box-shadow: 0 0 6px rgba(0, 255, 230, 0.05);
+    }
     li.coin-item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  box-shadow:
-    0 0 10px rgba(0, 255, 230, 0.25),
-    0 0 25px rgba(0, 255, 230, 0.15),
-    0 0 50px rgba(0, 255, 230, 0.08); /* ✅ 밝은 민트 네온 */
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow:
+        0 0 10px rgba(0, 255, 230, 0.25),
+        0 0 25px rgba(0, 255, 230, 0.15),
+        0 0 50px rgba(0, 255, 230, 0.08);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
     li.coin-item:hover {
-  background: #232323;
-  transform: translateY(-2px);
-  border-color: rgba(0, 255, 230, 0.4); /* ✅ 민트 강조 */
-}
+      background: #232323;
+      transform: translateY(-2px);
+      border-color: rgba(0, 255, 230, 0.40);
+    }
+    li.coin-item:hover::after { opacity: 1; }
 
-    li.coin-item:hover::after {
-  opacity: 1; /* ✅ hover 시 민트빛 글로우 활성화 */
-}
-
-    /* 글씨 10% 축소 + 흰색 */
+    /* 텍스트 */
     .symbol {
       font-weight: bold;
       font-size: 16px;
       color: white;
       cursor: pointer;
       white-space: nowrap;
+      margin-right: 12px;                       /* 좌/우 간격 */
     }
     .meta {
+      margin-left: auto;                        /* ← 항상 우측 끝으로 */
+      text-align: right;                        /* ← 내부 우측 정렬 */
       color: #ccc;
       font-size: 14px;
-      margin-left: 8px;
       white-space: nowrap;
     }
-    /* ✅ 숫자만 살짝 더 크고 흰색으로 강조 */
     .meta .num {
       color: #fff;
-      font-size: 15px;       /* 주변 13px 대비 약 +2px */
+      font-size: 15px;                          /* 주변 대비 살짝 크게 */
       font-weight: 700;
     }
   </style>
@@ -153,7 +153,7 @@
         .append("li")
         .attr("class", "coin-item");
 
-      // 번호 + 코인명 (클릭 시 바이낸스 선물 링크)
+      // 번호 + 코인명 (클릭 시 바이낸스 선물)
       items.append("span")
         .attr("class", "symbol")
         .text((d, i) => `${i + 1}. ${d.symbol}`)
@@ -162,7 +162,7 @@
           window.open(url, "_blank");
         });
 
-      // Max변동폭 + 상장 후 경과일 (숫자 강조)
+      // Max변동폭 + 상장 경과일 (숫자 강조)
       items.append("span")
         .attr("class", "meta")
         .html(d => {
@@ -178,7 +178,7 @@
       const data = await fetchData();
       if (!data || data.length === 0) return;
 
-      // 상장부터의 기간순(일봉 적은 순) 정렬
+      // 상장부터의 기간순(일봉 적은 순)
       const sorted = data.slice().sort((a, b) => a.days - b.days);
       renderList(sorted);
     }
@@ -189,3 +189,4 @@
   </script>
 </body>
 </html>
+
