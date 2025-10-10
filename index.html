@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>SUPERHERO 신규 상장 코인 리스트 (3~6개월 이내)</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: black;
+      color: white;
+      font-family: "Noto Sans KR", sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+    body {
+      transform: scale(0.8);
+      transform-origin: top left;
+      width: 125%;
+      height: 125%;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: white;
+    }
+    #time { margin-bottom: 20px; font-size: 16px; color: #cccccc; }
+    #countdown { margin-left: 20px; color: #888; }
+
+    /* ✅ 리스트 컨테이너 (2~3열 자동 + 오른쪽 여백 확보) */
+    ul#coin-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 10px 20px;
+      padding-right: 40px; /* 오른쪽 여백 */
+      box-sizing: border-box;
+    }
+
+    li.coin-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #111;
+      padding: 10px 16px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    li.coin-item:hover {
+      background: #222;
+      transform: translateY(-2px);
+    }
+
+    /* ✅ 글씨 크기 10% 축소 + 흰색 */
+    .symbol {
+      font-weight: bold;
+      font-size: 16px;
+      color: white;
+      cursor: pointer;
+    }
+    .listed {
+      color: #ccc;
+      font-size: 13px;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>■ SUPERHERO 신규 상장 코인 리스트 (3~6개월 이내) ■</h1>
+  <div id="time">
+    UTC 시간 로딩 중... <span id="countdown">다음 갱신까지 60s</span>
+  </div>
+  <ul id="coin-list"></ul>
+
+  <script>
+    const API_URL = "https://binance-flask-app-production.up.railway.app/recent_3to6m";
+    let secondsToNextUpdate = 60;
+
+    function updateTimeLabel() {
+      const now = new Date();
+      const y = now.getUTCFullYear();
+      const m = String(now.getUTCMonth() + 1).padStart(2, '0');
+      const d = String(now.getUTCDate()).padStart(2, '0');
+      const h = String(now.getUTCHours()).padStart(2, '0');
+      const mm = String(now.getUTCMinutes()).padStart(2, '0');
+      document.getElementById("time").childNodes[0].textContent = `${y}-${m}-${d} ${h}:${mm} UTC`;
+    }
+
+    function startCountdown() {
+      setInterval(() => {
+        secondsToNextUpdate--;
+        if (secondsToNextUpdate <= 0) secondsToNextUpdate = 60;
+        document.getElementById("countdown").textContent = `다음 갱신까지 ${secondsToNextUpdate}s`;
+      }, 1000);
+    }
+
+    async function fetchData() {
+      try {
+        const res = await fetch(API_URL);
+        return await res.json();
+      } catch (e) {
+        console.error("API fetch error:", e);
+        return [];
+      }
+    }
+
+    function renderList(data) {
+      const list = d3.select("#coin-list");
+      list.selectAll("li").remove();
+
+      const items = list.selectAll("li.coin-item")
+        .data(data)
+        .enter()
+        .append("li")
+        .attr("class", "coin-item");
+
+      // ✅ 코인명 + 상장일 함께 표시
+      items.append("span")
+        .attr("class", "symbol")
+        .text(d => d.symbol)
+        .on("click", (event, d) => {
+          const url = `https://www.binance.com/en/futures/${d.symbol}`;
+          window.open(url, "_blank");
+        })
+        .each(function(d) {
+          const parent = d3.select(this.parentNode);
+          parent.append("span")
+            .attr("class", "listed")
+            .text(`상장 후 약 ${d.days}일`);
+        });
+    }
+
+    async function updateList() {
+      updateTimeLabel();
+      secondsToNextUpdate = 60;
+      const data = await fetchData();
+      if (!data || data.length === 0) return;
+
+      const sorted = data.sort((a, b) => a.days - b.days);
+      renderList(sorted);
+    }
+
+    updateList();
+    setInterval(updateList, 60 * 1000);
+    startCountdown();
+  </script>
+</body>
+</html>
