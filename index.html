@@ -31,7 +31,7 @@
     #time { margin-bottom: 20px; font-size: 16px; color: #cccccc; }
     #countdown { margin-left: 20px; color: #888; }
 
-    /* ✅ 리스트 컨테이너 (2~3열 자동 + 오른쪽 여백 확보) */
+    /* 리스트: 2~N열 자동 + 오른쪽 여백 확보 */
     ul#coin-list {
       list-style: none;
       padding: 0;
@@ -39,35 +39,40 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
       gap: 10px 20px;
-      padding-right: 40px; /* 오른쪽 여백 */
+      padding-right: 60px;  /* 오른쪽에 공백 추가 */
       box-sizing: border-box;
     }
 
     li.coin-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #111;
-      padding: 10px 16px;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1b1b1b;   /* ✅ 기존 #111 → 약간 더 밝은 톤 */
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.05); /* ✅ 은은한 외곽 그림자 */
+}
     li.coin-item:hover {
-      background: #222;
-      transform: translateY(-2px);
-    }
+  background: #2a2a2a;   /* ✅ hover 시 조금 더 밝게 */
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.15); /* ✅ hover 시 초록빛 glow */
+}
 
-    /* ✅ 글씨 크기 10% 축소 + 흰색 */
+
+    /* 글씨 10% 축소 + 흰색 */
     .symbol {
       font-weight: bold;
       font-size: 16px;
       color: white;
       cursor: pointer;
+      white-space: nowrap;
     }
-    .listed {
+    .meta {
       color: #ccc;
       font-size: 13px;
       margin-left: 8px;
+      white-space: nowrap;
     }
   </style>
 </head>
@@ -110,6 +115,11 @@
       }
     }
 
+    function fmtRange(x) {
+      if (x === undefined || x === null || isNaN(x)) return "-";
+      return (Math.abs(x - Math.round(x)) < 0.05 ? Math.round(x) : x.toFixed(1)) + "%";
+    }
+
     function renderList(data) {
       const list = d3.select("#coin-list");
       list.selectAll("li").remove();
@@ -120,20 +130,19 @@
         .append("li")
         .attr("class", "coin-item");
 
-      // ✅ 코인명 + 상장일 함께 표시
+      // 번호 + 코인명 (클릭 시 바이낸스 선물 링크)
       items.append("span")
         .attr("class", "symbol")
-        .text(d => d.symbol)
+        .text((d, i) => `${i + 1}. ${d.symbol}`)
         .on("click", (event, d) => {
           const url = `https://www.binance.com/en/futures/${d.symbol}`;
           window.open(url, "_blank");
-        })
-        .each(function(d) {
-          const parent = d3.select(this.parentNode);
-          parent.append("span")
-            .attr("class", "listed")
-            .text(`상장 후 약 ${d.days}일`);
         });
+
+      // Max변동폭 + 상장 후 경과일
+      items.append("span")
+        .attr("class", "meta")
+        .text(d => `Max변동폭: ${fmtRange(d.max_range_pct)} · 상장 후 약 ${d.days}일`);
     }
 
     async function updateList() {
@@ -142,7 +151,8 @@
       const data = await fetchData();
       if (!data || data.length === 0) return;
 
-      const sorted = data.sort((a, b) => a.days - b.days);
+      // 상장부터의 기간순(일봉 적은 순) 정렬
+      const sorted = data.slice().sort((a, b) => a.days - b.days);
       renderList(sorted);
     }
 
@@ -151,4 +161,6 @@
     startCountdown();
   </script>
 </body>
+</html>
+
 </html>
