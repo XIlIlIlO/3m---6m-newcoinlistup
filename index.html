@@ -15,12 +15,14 @@
       height: 100vh;
       overflow-x: hidden;
     }
+    :root { --scale: 0.75; } /* 0.7, 0.8, 0.9 ... 원하는 배율 */
+    
     body {
-      transform: scale(0.8);
+      transform: scale(var(--scale));
       transform-origin: top left;
-      width: 125%;
-      height: 125%;
-      padding: 40px;
+      width: calc(100% / var(--scale));   /* ← 역보정: 0.7이면 142.857% */
+      height: calc(100% / var(--scale));  /* ← 역보정 */
+      padding: calc(40px / var(--scale)); /* ← 시각적 패딩 유지 (0.7이면 약 57px) */
     }
     h1 {
       font-size: 26px;
