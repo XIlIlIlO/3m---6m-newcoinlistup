@@ -46,39 +46,43 @@
       box-sizing: border-box;
     }
 
-    /* 카드 + 민트 네온 */
-    li.coin-item {
-      display: flex;
-      justify-content: flex-start;              /* ← 좌측 정렬 고정 */
-      align-items: center;
-      position: relative;
-      background: #1b1b1b;
-      padding: 10px 16px;
-      border-radius: 8px;
-      transition: all 0.25s ease;
-      border: 1px solid rgba(0, 255, 230, 0.12); /* 민트 테두리 */
-      box-shadow: 0 0 6px rgba(0, 255, 230, 0.05);
-    }
-    li.coin-item::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      pointer-events: none;
-      box-shadow:
-        0 0 10px rgba(0, 255, 230, 0.25),
-        0 0 25px rgba(0, 255, 230, 0.15),
-        0 0 50px rgba(0, 255, 230, 0.08);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-    }
-    li.coin-item:hover {
-      background: #232323;
-      transform: translateY(-2px);
-      border-color: rgba(0, 255, 230, 0.40);
-    }
-    li.coin-item:hover::after { opacity: 1; }
+    /* 카드 + 네온 그린 (#afff00) */
+li.coin-item {
+  position: relative;
+  background: #1b1b1b;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(175, 255, 0, 0.12); /* 💚 네온 그린 테두리 */
+  box-shadow: 0 0 6px rgba(175, 255, 0, 0.05);
+  display: flex;
+  justify-content: flex-start;  /* ← 좌측 정렬 고정 */
+  align-items: center;
+}
 
+li.coin-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    0 0 10px rgba(175, 255, 0, 0.25),
+    0 0 25px rgba(175, 255, 0, 0.15),
+    0 0 50px rgba(175, 255, 0, 0.08); /* 💚 네온 그린 글로우 */
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+li.coin-item:hover {
+  background: #232323;
+  transform: translateY(-2px);
+  border-color: rgba(175, 255, 0, 0.4); /* 💚 강조 네온 그린 */
+}
+
+li.coin-item:hover::after {
+  opacity: 1; /* hover 시 네온 그린 글로우 활성화 */
+}
     /* 텍스트 */
     .symbol {
       font-weight: bold;
